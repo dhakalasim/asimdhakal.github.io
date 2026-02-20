@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Meeting Countdown</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/orbitron@5.0.0/index.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5.0.0/index.min.css">
+    
+    <style>
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-purple: #bc13fe;
+            --dark-bg: #050510;
+            --glass-bg: rgba(10, 10, 25, 0.75);
+            --border-color: rgba(0, 243, 255, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background-color: var(--dark-bg);
+            background-image: url('https://image.qwenlm.ai/public_source/6dd0fd92-c4b3-47d5-92fc-a8c03f4be158/1b3845e84-e2aa-4af5-9a71-837dd62c650a.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: white;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(0,0,0,0.4) 0%, rgba(5,5,16,0.9) 100%);
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 3rem;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.15), inset 0 0 20px rgba(188, 19, 254, 0.1);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        .corner {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--neon-cyan);
+            transition: all 0.3s ease;
+        }
+        .top-left { top: -2px; left: -2px; border-right: none; border-bottom: none; }
+        .top-right { top: -2px; right: -2px; border-left: none; border-bottom: none; }
+        .bottom-left { bottom: -2px; left: -2px; border-right: none; border-top: none; }
+        .bottom-right { bottom: -2px; right: -2px; border-left: none; border-top: none; }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 1rem;
+        }
+
+        .status-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--neon-cyan);
+            border: 1px solid var(--neon-cyan);
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+        }
+
+        .philosophy-quote {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.7);
+            font-style: italic;
+            margin-top: 0.5rem;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .label {
+            font-size: 1rem;
+            color: var(--neon-purple);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 5px var(--neon-purple);
+        }
+
+        .countdown-display {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .time-unit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(0, 243, 255, 0.05);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+        }
+
+        .time-value {
+            font-size: 3.5rem;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+            line-height: 1;
+            letter-spacing: 2px;
+        }
+
+        .time-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.6);
+            margin-top: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .secondary-info {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px dashed rgba(255,255,255,0.2);
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .austin-clock {
+            text-align: left;
+        }
+        .austin-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+        .austin-time {
+            font-size: 2rem;
+            font-weight: 500;
+            color: white;
+            letter-spacing: 1px;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+        }
+
+        .meeting-target {
+            text-align: right;
+        }
+        .target-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--neon-purple);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+        .target-time {
+            font-size: 1.3rem;
+            color: white;
+            letter-spacing: 1px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .time-value { font-size: 2.5rem; }
+            .secondary-info { flex-direction: column; gap: 1.5rem; text-align: center; }
+            .meeting-target { text-align: center; }
+            .container { padding: 1.5rem; }
+            .countdown-display { gap: 1rem; }
+            .time-unit { padding: 0.75rem 1rem; }
+            .time-value { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="corner top-left"></div>
+        <div class="corner top-right"></div>
+        <div class="corner bottom-left"></div>
+        <div class="corner bottom-right"></div>
+
+        <div class="header">
+            <div class="status-badge">System Online</div>
+            <div class="philosophy-quote" id="quote">"Time is the substance I am made of."</div>
+        </div>
+
+        <div class="main-content">
+            <div class="label">Time Remaining Till 8PM NPT Meeting</div>
+            
+            <div class="countdown-display">
+                <div class="time-unit">
+                    <div class="time-value" id="days">00</div>
+                    <div class="time-label">Days</div>
+                </div>
+                <div class="time-unit">
+                    <div class="time-value" id="hours">00</div>
+                    <div class="time-label">Hours</div>
+                </div>
+                <div class="time-unit">
+                    <div class="time-value" id="minutes">00</div>
+                    <div class="time-label">Mins</div>
+                </div>
+                <div class="time-unit">
+                    <div class="time-value" id="seconds">00</div>
+                    <div class="time-label">Secs</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="secondary-info">
+            <div class="austin-clock">
+                <div class="austin-label">Austin, TX (Local)</div>
+                <div class="austin-time" id="austin-time">--:--:-- --</div>
+            </div>
+            <div class="meeting-target">
+                <div class="target-label">Next Sync Target</div>
+                <div class="target-time">Friday 20:00 NPT</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const quotes = [
+            "\"Time is the substance I am made of.\"",
+            "\"The future is already here – it's just not evenly distributed.\"",
+            "\"Reality is merely an illusion, albeit a very persistent one.\"",
+            "\"We are the universe experiencing itself.\""
+        ];
+
+        function updateClocks() {
+            const now = new Date();
+            
+            let target = new Date(now);
+            const currentDay = target.getUTCDay();
+            
+            let daysUntilFriday = (5 - currentDay + 7) % 7;
+            
+            if (daysUntilFriday === 0) {
+                const utcTargetHour = 14;
+                const utcTargetMin = 15;
+                
+                if (now.getUTCHours() > utcTargetHour || (now.getUTCHours() === utcTargetHour && now.getUTCMinutes() >= utcTargetMin)) {
+                    daysUntilFriday = 7;
+                }
+            }
+            
+            target.setUTCDate(target.getUTCDate() + daysUntilFriday);
+            target.setUTCHours(14, 15, 0, 0);
+
+            const diff = target - now;
+            
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById('days').innerText = d < 10 ? '0' + d : d;
+            document.getElementById('hours').innerText = h < 10 ? '0' + h : h;
+            document.getElementById('minutes').innerText = m < 10 ? '0' + m : m;
+            document.getElementById('seconds').innerText = s < 10 ? '0' + s : s;
+
+            const austinOptions = {
+                timeZone: 'America/Chicago',
+                hour: 'numeric',
+                minute: 'numeric',
+                second: 'numeric',
+                hour12: true
+            };
+            const austinTimeStr = new Intl.DateTimeFormat('en-US', austinOptions).format(now);
+            document.getElementById('austin-time').innerText = austinTimeStr;
+        }
+
+        document.getElementById('quote').innerText = quotes[Math.floor(Math.random() * quotes.length)];
+
+        setInterval(updateClocks, 1000);
+        updateClocks();
+    </script>
+</body>
+</html>
+
